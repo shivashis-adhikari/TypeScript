@@ -1,0 +1,130 @@
+//// [tests/cases/compiler/disallowUnerasableAssertionUnaryExponentiation.ts] ////
+
+=== disallowUnerasableAssertionUnaryExponentiation.ts ===
+// https://github.com/microsoft/TypeScript/issues/65170
+
+// '-x ** y' is a syntax error in JavaScript. Erasing 'as T' or 'satisfies T' in '-x as T ** y'
+// leaves exactly that, so the unary expression must be parenthesized here as well.
+
+declare let x: number;
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+declare let o: { p?: number };
+>o : Symbol(o, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 6, 11))
+>p : Symbol(p, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 6, 16))
+
+declare let p: Promise<number>;
+>p : Symbol(p, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 7, 11))
+>Promise : Symbol(Promise, Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2018.promise.d.ts, --, --))
+
+export const a01 = -x as number ** 2;  // Error
+>a01 : Symbol(a01, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 9, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a02 = +x as number ** 2;  // Error
+>a02 : Symbol(a02, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 10, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a03 = ~x as number ** 2;  // Error
+>a03 : Symbol(a03, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 11, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a04 = !x as any ** 2;  // Error
+>a04 : Symbol(a04, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 12, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a05 = typeof x as any ** 2;  // Error
+>a05 : Symbol(a05, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 13, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a06 = void x as any ** 2;  // Error
+>a06 : Symbol(a06, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 14, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a07 = delete o.p as any ** 2;  // Error
+>a07 : Symbol(a07, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 15, 12))
+>o.p : Symbol(p, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 6, 16))
+>o : Symbol(o, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 6, 11))
+>p : Symbol(p, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 6, 16))
+
+export const a08 = <number>x as number ** 2;  // Error
+>a08 : Symbol(a08, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 16, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a09 = -x as any as number ** 2;  // Error
+>a09 : Symbol(a09, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 17, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const a10 = -x as number ** 2 ** 2;  // Error
+>a10 : Symbol(a10, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 18, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export async function a11() {
+>a11 : Symbol(a11, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 18, 42))
+
+    return await p as number ** 2;  // Error
+>p : Symbol(p, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 7, 11))
+}
+
+export const b01 = -x satisfies number ** 2;  // Error
+>b01 : Symbol(b01, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 23, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const b02 = ~x satisfies number ** 2;  // Error
+>b02 : Symbol(b02, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 24, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const b03 = -x satisfies any satisfies number ** 2;  // Error
+>b03 : Symbol(b03, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 25, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const b04 = -x as any satisfies number ** 2;  // Error
+>b04 : Symbol(b04, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 26, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export async function b05() {
+>b05 : Symbol(b05, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 26, 51))
+
+    return await p satisfies number as any ** 2;  // Error
+>p : Symbol(p, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 7, 11))
+}
+
+// Update expressions may appear on the left of '**'.
+export const c01 = ++x as number ** 2;
+>c01 : Symbol(c01, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 32, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const c02 = x++ as number ** 2;
+>c02 : Symbol(c02, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 33, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const c03 = --x satisfies number ** 2;
+>c03 : Symbol(c03, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 34, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+// A parenthesized operand is fine.
+export const c04 = (-x) as number ** 2;
+>c04 : Symbol(c04, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 37, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const c05 = (-x as number) ** 2;
+>c05 : Symbol(c05, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 38, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const c06 = (-x satisfies number) ** 2;
+>c06 : Symbol(c06, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 39, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const c07 = -(x as number ** 2);
+>c07 : Symbol(c07, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 40, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+// Unary expressions on the right of '**' are fine.
+export const c08 = 2 ** -x as number;
+>c08 : Symbol(c08, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 43, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+
+export const c09 = 2 ** (-x as number);
+>c09 : Symbol(c09, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 44, 12))
+>x : Symbol(x, Decl(disallowUnerasableAssertionUnaryExponentiation.ts, 5, 11))
+

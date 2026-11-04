@@ -1,0 +1,240 @@
+//// [tests/cases/compiler/disallowUnerasableAssertionUnaryExponentiation.ts] ////
+
+=== disallowUnerasableAssertionUnaryExponentiation.ts ===
+// https://github.com/microsoft/TypeScript/issues/65170
+
+// '-x ** y' is a syntax error in JavaScript. Erasing 'as T' or 'satisfies T' in '-x as T ** y'
+// leaves exactly that, so the unary expression must be parenthesized here as well.
+
+declare let x: number;
+>x : number
+
+declare let o: { p?: number };
+>o : { p?: number; }
+>p : number | undefined
+
+declare let p: Promise<number>;
+>p : Promise<number>
+
+export const a01 = -x as number ** 2;  // Error
+>a01 : number
+>-x as number ** 2 : number
+>-x as number : number
+>-x : number
+>x : number
+>2 : 2
+
+export const a02 = +x as number ** 2;  // Error
+>a02 : number
+>+x as number ** 2 : number
+>+x as number : number
+>+x : number
+>x : number
+>2 : 2
+
+export const a03 = ~x as number ** 2;  // Error
+>a03 : number
+>~x as number ** 2 : number
+>~x as number : number
+>~x : number
+>x : number
+>2 : 2
+
+export const a04 = !x as any ** 2;  // Error
+>a04 : number
+>!x as any ** 2 : number
+>!x as any : any
+>!x : boolean
+>x : number
+>2 : 2
+
+export const a05 = typeof x as any ** 2;  // Error
+>a05 : number
+>typeof x as any ** 2 : number
+>typeof x as any : any
+>typeof x : "bigint" | "boolean" | "function" | "number" | "object" | "string" | "symbol" | "undefined"
+>x : number
+>2 : 2
+
+export const a06 = void x as any ** 2;  // Error
+>a06 : number
+>void x as any ** 2 : number
+>void x as any : any
+>void x : undefined
+>x : number
+>2 : 2
+
+export const a07 = delete o.p as any ** 2;  // Error
+>a07 : number
+>delete o.p as any ** 2 : number
+>delete o.p as any : any
+>delete o.p : boolean
+>o.p : number | undefined
+>o : { p?: number; }
+>p : number | undefined
+>2 : 2
+
+export const a08 = <number>x as number ** 2;  // Error
+>a08 : number
+><number>x as number ** 2 : number
+><number>x as number : number
+><number>x : number
+>x : number
+>2 : 2
+
+export const a09 = -x as any as number ** 2;  // Error
+>a09 : number
+>-x as any as number ** 2 : number
+>-x as any as number : number
+>-x as any : any
+>-x : number
+>x : number
+>2 : 2
+
+export const a10 = -x as number ** 2 ** 2;  // Error
+>a10 : number
+>-x as number ** 2 ** 2 : number
+>-x as number : number
+>-x : number
+>x : number
+>2 ** 2 : number
+>2 : 2
+>2 : 2
+
+export async function a11() {
+>a11 : () => Promise<number>
+
+    return await p as number ** 2;  // Error
+>await p as number ** 2 : number
+>await p as number : number
+>await p : number
+>p : Promise<number>
+>2 : 2
+}
+
+export const b01 = -x satisfies number ** 2;  // Error
+>b01 : number
+>-x satisfies number ** 2 : number
+>-x satisfies number : number
+>-x : number
+>x : number
+>2 : 2
+
+export const b02 = ~x satisfies number ** 2;  // Error
+>b02 : number
+>~x satisfies number ** 2 : number
+>~x satisfies number : number
+>~x : number
+>x : number
+>2 : 2
+
+export const b03 = -x satisfies any satisfies number ** 2;  // Error
+>b03 : number
+>-x satisfies any satisfies number ** 2 : number
+>-x satisfies any satisfies number : number
+>-x satisfies any : number
+>-x : number
+>x : number
+>2 : 2
+
+export const b04 = -x as any satisfies number ** 2;  // Error
+>b04 : number
+>-x as any satisfies number ** 2 : number
+>-x as any satisfies number : any
+>-x as any : any
+>-x : number
+>x : number
+>2 : 2
+
+export async function b05() {
+>b05 : () => Promise<number>
+
+    return await p satisfies number as any ** 2;  // Error
+>await p satisfies number as any ** 2 : number
+>await p satisfies number as any : any
+>await p satisfies number : number
+>await p : number
+>p : Promise<number>
+>2 : 2
+}
+
+// Update expressions may appear on the left of '**'.
+export const c01 = ++x as number ** 2;
+>c01 : number
+>++x as number ** 2 : number
+>++x as number : number
+>++x : number
+>x : number
+>2 : 2
+
+export const c02 = x++ as number ** 2;
+>c02 : number
+>x++ as number ** 2 : number
+>x++ as number : number
+>x++ : number
+>x : number
+>2 : 2
+
+export const c03 = --x satisfies number ** 2;
+>c03 : number
+>--x satisfies number ** 2 : number
+>--x satisfies number : number
+>--x : number
+>x : number
+>2 : 2
+
+// A parenthesized operand is fine.
+export const c04 = (-x) as number ** 2;
+>c04 : number
+>(-x) as number ** 2 : number
+>(-x) as number : number
+>(-x) : number
+>-x : number
+>x : number
+>2 : 2
+
+export const c05 = (-x as number) ** 2;
+>c05 : number
+>(-x as number) ** 2 : number
+>(-x as number) : number
+>-x as number : number
+>-x : number
+>x : number
+>2 : 2
+
+export const c06 = (-x satisfies number) ** 2;
+>c06 : number
+>(-x satisfies number) ** 2 : number
+>(-x satisfies number) : number
+>-x satisfies number : number
+>-x : number
+>x : number
+>2 : 2
+
+export const c07 = -(x as number ** 2);
+>c07 : number
+>-(x as number ** 2) : number
+>(x as number ** 2) : number
+>x as number ** 2 : number
+>x as number : number
+>x : number
+>2 : 2
+
+// Unary expressions on the right of '**' are fine.
+export const c08 = 2 ** -x as number;
+>c08 : number
+>2 ** -x as number : number
+>2 ** -x : number
+>2 : 2
+>-x : number
+>x : number
+
+export const c09 = 2 ** (-x as number);
+>c09 : number
+>2 ** (-x as number) : number
+>2 : 2
+>(-x as number) : number
+>-x as number : number
+>-x : number
+>x : number
+
