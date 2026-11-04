@@ -4782,6 +4782,11 @@ func (p *Parser) parseBinaryExpressionRest(precedence ast.OperatorPrecedence, le
 				if shouldConsumeBinaryOperator(nextOperator, nextPrecedence, lastPrecedence) {
 					break
 				}
+				// In '-x as T ** y', erasing the assertion leaves '-x ** y', so report the same error as for that.
+				// See https://github.com/microsoft/TypeScript/issues/65170.
+				if nextOperator == ast.KindAsteriskAsteriskToken {
+					p.checkUnaryExpressionBeforeExponentiation(lastOperand)
+				}
 			}
 		} else {
 			leftOperand = p.makeBinaryExpression(leftOperand, p.parseTokenNode(), p.parseBinaryExpressionOrHigher(newPrecedence), pos)
@@ -4840,6 +4845,35 @@ func (p *Parser) parseUnaryExpressionOrHigher() *ast.Expression {
 		}
 	}
 	return simpleUnaryExpression
+}
+
+// checkUnaryExpressionBeforeExponentiation reports an error if node is a unary expression or type assertion that
+// would be the left operand of '**' once the type assertions after it are erased.
+func (p *Parser) checkUnaryExpressionBeforeExponentiation(node *ast.Expression) {
+	pos := scanner.SkipTrivia(p.sourceText, node.Pos())
+	var operator ast.Kind
+	switch node.Kind {
+	case ast.KindTypeAssertionExpression:
+		p.parseErrorAt(pos, node.End(), diagnostics.A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses)
+		return
+	case ast.KindPrefixUnaryExpression:
+		operator = node.AsPrefixUnaryExpression().Operator
+		if operator == ast.KindPlusPlusToken || operator == ast.KindMinusMinusToken {
+			// '++x ** y' and '--x ** y' are valid.
+			return
+		}
+	case ast.KindDeleteExpression:
+		operator = ast.KindDeleteKeyword
+	case ast.KindTypeOfExpression:
+		operator = ast.KindTypeOfKeyword
+	case ast.KindVoidExpression:
+		operator = ast.KindVoidKeyword
+	case ast.KindAwaitExpression:
+		operator = ast.KindAwaitKeyword
+	default:
+		return
+	}
+	p.parseErrorAt(pos, node.End(), diagnostics.An_unary_expression_with_the_0_operator_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses, scanner.TokenToString(operator))
 }
 
 func (p *Parser) isUpdateExpression() bool {
